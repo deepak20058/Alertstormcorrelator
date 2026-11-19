@@ -1,0 +1,68 @@
+import { ICorrelationRule } from '../../types';
+
+export const defaultCorrelationRules: ICorrelationRule[] = [
+  {
+    ruleId: 'RULE-DUP-01',
+    name: 'Sliding Window Duplicate Suppression',
+    description: 'Identifies repeated identical alert fingerprints within a 15-minute sliding window and merges into primary alert',
+    ruleType: 'DUPLICATE',
+    timeWindowMinutes: 15,
+    conditions: { matchFields: ['fingerprint'] },
+    severity: 'Low',
+    isActive: true,
+  },
+  {
+    ruleId: 'RULE-IP-01',
+    name: 'Suspicious IP Pivot Correlation',
+    description: 'Groups multiple alerts targeting or originating from the same external IP address across all security sensors',
+    ruleType: 'IP_MATCH',
+    timeWindowMinutes: 60,
+    conditions: { matchFields: ['sourceIp', 'destinationIp'] },
+    severity: 'High',
+    isActive: true,
+  },
+  {
+    ruleId: 'RULE-ENTITY-01',
+    name: 'User & Host Entity Convergence',
+    description: 'Correlates distinct security signals sharing common user credentials or internal hostnames across EDR and Identity systems',
+    ruleType: 'ENTITY_MATCH',
+    timeWindowMinutes: 60,
+    conditions: { matchFields: ['username', 'hostname'] },
+    severity: 'High',
+    isActive: true,
+  },
+  {
+    ruleId: 'RULE-BEHAVIOR-01',
+    name: 'Authentication Anomalies & Brute Force to Success',
+    description: 'Detects multiple failed authentication attempts immediately followed by a successful login and privilege escalation',
+    ruleType: 'BEHAVIOR_SEQUENCE',
+    timeWindowMinutes: 30,
+    conditions: {
+      sequence: ['Failed Login', 'Successful Login', 'Privilege Escalation'],
+    },
+    severity: 'Critical',
+    isActive: true,
+  },
+  {
+    ruleId: 'RULE-ATTACK-01',
+    name: 'Multi-Stage APT Kill-Chain Sequence',
+    description: 'Detects full kill-chain progression: Reconnaissance -> Initial Access -> Lateral Movement -> Data Exfiltration',
+    ruleType: 'ATTACK_PATTERN',
+    timeWindowMinutes: 120,
+    conditions: {
+      stages: ['Reconnaissance', 'Authentication', 'Privilege Escalation', 'Lateral Movement', 'Exfiltration'],
+    },
+    severity: 'Critical',
+    isActive: true,
+  },
+  {
+    ruleId: 'RULE-MULTI-01',
+    name: 'Cross-Sensor Multi-Source Verification',
+    description: 'Correlates corroborating alerts from distinct detection technologies (e.g. Perimeter Firewall + Endpoint EDR + Identity Provider)',
+    ruleType: 'MULTI_SOURCE',
+    timeWindowMinutes: 45,
+    conditions: { minDistinctSources: 2 },
+    severity: 'High',
+    isActive: true,
+  },
+];
